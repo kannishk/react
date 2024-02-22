@@ -1,4 +1,28 @@
-export function Cache() {}
+import axios from "axios";
+export function Cache() {
+  async function fetchDataWithCache(url) {
+    const cachedData = localStorage.getItem(url);
+    if (cachedData) {
+      const { data, timestamp } = JSON.parse(cachedData);
+      if (new Date().getTime() - timestamp < ttl) {
+        return data;
+      }
+    }
+    try {
+      const response = await axios.get(url).data;
+      localStorage.setItem(
+        url,
+        JSON.stringify({ data: response, timestamp: new Date().getTime() })
+      );
+      return response;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  const ttl = 3600000;
+  fetchDataWithCache();
+}
 
 /*
 ### **Question 5**
